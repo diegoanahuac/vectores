@@ -1,13 +1,12 @@
-public class nodo {
+public class Nodo {
     Object dato;
-    nodo siguiente;
+    Nodo siguiente;
 
-    nodo (Object objeto){
-        this(objeto,null);
-
+    Nodo (Object objeto){
+        this(objeto, null);
     }
 
-    nodo (Object objeto, nodo nodo){
+    Nodo (Object objeto, Nodo nodo){
         dato = objeto;
         siguiente = nodo;
     }
