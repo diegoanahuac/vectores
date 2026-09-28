@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 class ArbolBinario {
 
     class Nodo {
@@ -65,11 +67,15 @@ class ArbolBinario {
 
 public class Recorridos {
     public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
         ArbolBinario arbol = new ArbolBinario();
-        int[] valores = {14, 4, 15, 3, 9, 18, 7, 16, 20, 5, 17};
-        for (int v : valores) {
-            arbol.insertar(v);
+        System.out.print("Cuantos valores quieres insertar? ");
+        int n = sc.nextInt();
+        for (int i = 1; i <= n; i++) {
+            System.out.print("Valor " + i + ": ");
+            arbol.insertar(sc.nextInt());
         }
+        sc.close();
         System.out.print("Preorden: ");
         arbol.preorden(arbol.raiz);
         System.out.println();
