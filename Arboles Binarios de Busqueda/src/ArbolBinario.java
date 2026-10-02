@@ -82,6 +82,38 @@ public class ArbolBinario {
         }
     }
 
+    private int minValor(Nodo nodo) {
+        if (nodo.izq == null) {
+            return nodo.info;
+        }
+        return minValor(nodo.izq);
+    }
+
+    public void eliminar(int clave) {
+        raiz = eliminarRec(raiz, clave);
+    }
+
+    private Nodo eliminarRec(Nodo nodo, int clave) {
+        if (nodo == null) {
+            return null;
+        }
+        if (clave < nodo.info) {
+            nodo.izq = eliminarRec(nodo.izq, clave);
+        } else if (clave > nodo.info) {
+            nodo.der = eliminarRec(nodo.der, clave);
+        } else {
+            if (nodo.izq == null) {
+                return nodo.der;
+            }
+            if (nodo.der == null) {
+                return nodo.izq;
+            }
+            nodo.info = minValor(nodo.der);
+            nodo.der = eliminarRec(nodo.der, nodo.info);
+        }
+        return nodo;
+    }
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         ArbolBinario arbol = new ArbolBinario();
@@ -93,6 +125,8 @@ public class ArbolBinario {
         }
         System.out.print("Valor a buscar: ");
         int clave = sc.nextInt();
+        System.out.print("Valor a eliminar: ");
+        int borrar = sc.nextInt();
         sc.close();
         System.out.print("Preorden: ");
         arbol.preorden(arbol.raiz);
@@ -104,5 +138,13 @@ public class ArbolBinario {
         arbol.postorden(arbol.raiz);
         System.out.println();
         System.out.println("Buscar " + clave + ": " + arbol.buscar(clave));
+        arbol.eliminar(borrar);
+        System.out.println("Despues de eliminar " + borrar + ":");
+        System.out.print("Preorden: ");
+        arbol.preorden(arbol.raiz);
+        System.out.println();
+        System.out.print("Inorden: ");
+        arbol.inorden(arbol.raiz);
+        System.out.println();
     }
 }
