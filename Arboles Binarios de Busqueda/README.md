@@ -271,3 +271,127 @@ Resultado esperado: `Preorden: 50 40 20 70 60 80`
 Resultado esperado: el árbol queda igual.
 
 ![Fase 4 - Eliminar valor inexistente](assets/fase4_no_existe.png)
+
+---
+
+## Preguntas
+
+Árbol construido con `50, 30, 20, 40, 70, 60, 80`.
+
+### Árbol inicial
+
+**2. ¿Qué propiedad debe cumplir todo Árbol Binario de Búsqueda?**
+
+Todo lo que está a la izquierda de un nodo tiene que ser menor que él, y todo lo que está a la derecha tiene que ser mayor. Esto se cumple en cada nodo del árbol, no solo en la raíz.
+
+**3. ¿Cuál es la raíz del árbol construido?**
+
+El 50, porque fue el primer valor que se insertó.
+
+**4. ¿Qué nodos son hojas?**
+
+El 20, el 40, el 60 y el 80, porque ninguno tiene hijos.
+
+**5. ¿Qué valores pertenecen al subárbol izquierdo de 50 y cuáles al derecho?**
+
+Al izquierdo pertenecen 30, 20 y 40. Al derecho pertenecen 70, 60 y 80.
+
+**6. ¿Qué secuencia esperas obtener con el recorrido inorden?**
+
+20, 30, 40, 50, 60, 70, 80. Sale ordenado de menor a mayor.
+
+### 7. Método de búsqueda
+
+**¿Por qué no es necesario recorrer todos los nodos del árbol para buscar una clave?**
+
+Porque en cada nodo comparo el número que busco y con eso ya sé si tengo que ir a la izquierda o a la derecha. El otro lado lo puedo ignorar completo, entonces en cada paso me ahorro la mitad del camino.
+
+**Si se busca 40, ¿qué nodos se visitan y en qué orden?**
+
+Primero el 50, luego el 30 y al final el 40, que es donde lo encuentro.
+
+**Si se busca 90, ¿qué condición permitirá concluir que no existe?**
+
+Se pasa por el 50, el 70 y el 80, y como 90 es mayor que 80 tendría que seguir a la derecha, pero ahí ya no hay nada. Llegar a un lugar vacío es lo que me dice que no existe.
+
+**¿Qué valor booleano debe regresar el caso base cuando el nodo actual es null?**
+
+Debe regresar falso, porque si llegué a un lugar vacío significa que el número no está en el árbol.
+
+**¿Qué ocurriría si el árbol no respetara la regla menor-izquierda y mayor-derecha?**
+
+La búsqueda se podría ir por el lado equivocado y decir que un número no está aunque sí esté. Para estar seguro tendría que revisar todo el árbol, y se perdería la ventaja de usar un ABB.
+
+### 8. Menor valor
+
+**¿Hacia qué dirección debes desplazarte para encontrar el mínimo?**
+
+Hacia la izquierda, porque ahí siempre están los valores más chicos.
+
+**¿Qué condición indica que ya encontraste el nodo mínimo?**
+
+Cuando el nodo ya no tiene hijo a la izquierda. Si no hay nada más a la izquierda, no hay ningún número más chico que él.
+
+**¿Cuál es el mínimo del subárbol cuya raíz es 70 en el árbol inicial?**
+
+El 60, porque es el hijo izquierdo de 70 y ya no tiene nada a su izquierda.
+
+### 9. Eliminación
+
+**¿Por qué la eliminación requiere más casos que la búsqueda?**
+
+Porque en la búsqueda solo veo si el número está o no, y el árbol no cambia. Al eliminar además tengo que acomodar el árbol para que no se rompa, y la forma de hacerlo depende de cuántos hijos tenga el nodo que quito.
+
+**¿Qué debe ocurrir si la clave que se desea eliminar no existe?**
+
+Nada, el árbol se queda exactamente igual.
+
+**¿Por qué eliminar un nodo hoja es el caso más sencillo?**
+
+Porque no tiene nada colgando debajo. Solo hay que soltarlo del padre y no se pierde nada más.
+
+**Si un nodo tiene solamente un hijo, ¿por qué puede devolverse directamente la referencia a ese hijo?**
+
+Porque ese hijo y todo lo que tiene debajo ya estaban del lado correcto respecto al padre del nodo que se borra. Entonces puede subir y ocupar su lugar sin desordenar nada.
+
+**¿Por qué el menor valor del subárbol derecho es un candidato adecuado para sustituir a un nodo con dos hijos?**
+
+Porque es más grande que todo lo que está a la izquierda y más chico que todo lo demás que está a la derecha. Es el único número que puede quedar en ese lugar sin romper el orden del árbol.
+
+**Después de copiar el valor sustituto, ¿por qué todavía es necesario eliminar ese valor de su ubicación original?**
+
+Porque si no, ese número quedaría dos veces en el árbol, una en el lugar nuevo y otra en el lugar de donde salió.
+
+**¿Qué riesgo existiría si se eliminara un nodo con dos hijos sin reconectar correctamente sus subárboles?**
+
+Se podrían perder partes completas del árbol, porque nada apuntaría a ellas. También podría quedar desordenado y las búsquedas ya no funcionarían bien.
+
+**¿Por qué eliminar la raíz puede modificar la variable raiz del árbol?**
+
+Porque si quito la raíz otro nodo tiene que ocupar su lugar, y el árbol necesita saber cuál es su nuevo punto de inicio. Si es el único nodo, el árbol se queda vacío.
+
+**¿Qué propiedad debe seguir cumpliendo el árbol después de cualquier eliminación?**
+
+La misma de siempre, menores a la izquierda y mayores a la derecha en todos los nodos.
+
+### 10. Reflexiones finales
+
+**¿Cómo ayuda el recorrido inorden a comprobar que el ABB conserva su estructura?**
+
+Si después de insertar o eliminar el inorden sigue saliendo ordenado de menor a mayor, sé que el árbol sigue bien acomodado. Si algún número sale fuera de orden, algo se rompió.
+
+**Explica con tus palabras el caso de eliminación que consideraste más difícil.**
+
+El más difícil fue cuando el nodo tiene dos hijos, porque no se puede quitar y ya, ya que alguno de los dos lados se quedaría sin padre. Lo que se hace es buscar el número más chico del lado derecho, ponerlo en el lugar del que quiero borrar y después borrar ese número de donde estaba. Al principio me costó entender por qué se elegía ese número, hasta que vi que es el único que deja todo en orden.
+
+**¿Qué papel cumple la recursividad en los métodos de búsqueda y eliminación?**
+
+Permite que el método se llame a sí mismo con un pedazo más chico del árbol, y así va bajando nodo por nodo hasta encontrar el número o llegar a un lugar vacío. Hace que el código sea corto y que se parezca a cómo uno lo resolvería a mano.
+
+**¿Qué aprendiste sobre el cambio de referencias entre nodos al eliminar elementos?**
+
+Que eliminar en realidad es cambiar a quién apunta el padre. El nodo no se borra solo, deja de estar conectado. Por eso es importante que el padre guarde lo que regresa el método, porque si no se reconecta el árbol no cambia o se pierden nodos.
+
+**Si tuvieras que explicar a un compañero la diferencia entre buscar y eliminar en un ABB, ¿qué le dirías?**
+
+Que buscar solo es mirar, bajas comparando hasta encontrar el número o llegar a un lugar vacío y el árbol no se toca. Eliminar empieza igual, pero cuando encuentras el número tienes que quitarlo y volver a acomodar el árbol para que siga ordenado.
