@@ -64,6 +64,24 @@ public class ArbolBinario {
         }
     }
 
+    public boolean buscar(int clave) {
+        return buscarRec(raiz, clave);
+    }
+
+    private boolean buscarRec(Nodo nodo, int clave) {
+        if (nodo == null) {
+            return false;
+        }
+        if (clave == nodo.info) {
+            return true;
+        }
+        if (clave < nodo.info) {
+            return buscarRec(nodo.izq, clave);
+        } else {
+            return buscarRec(nodo.der, clave);
+        }
+    }
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         ArbolBinario arbol = new ArbolBinario();
@@ -73,6 +91,8 @@ public class ArbolBinario {
             System.out.print("Valor " + i + ": ");
             arbol.insertar(sc.nextInt());
         }
+        System.out.print("Valor a buscar: ");
+        int clave = sc.nextInt();
         sc.close();
         System.out.print("Preorden: ");
         arbol.preorden(arbol.raiz);
@@ -83,5 +103,6 @@ public class ArbolBinario {
         System.out.print("Postorden: ");
         arbol.postorden(arbol.raiz);
         System.out.println();
+        System.out.println("Buscar " + clave + ": " + arbol.buscar(clave));
     }
 }
