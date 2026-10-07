@@ -1,32 +1,10 @@
 import java.util.ArrayList;
 
-/**
- * Clase Grafo - Representa un grafo no dirigido G = (V, E).
- *
- * Conceptos reforzados:
- * - Grafo G con conjuntos V(G) de vértices y E(G) de aristas
- * - Función punto extremo-arista
- * - Grado de vértice (bucle cuenta doble)
- * - Teorema del Saludo de Mano: gradoTotal = 2 × |E|
- * - Corolario 10.1.2: El grado total de un grafo siempre es par
- *
- * @author Diego Olea
- * @version 1.0
- * Periodo 202660
- */
 public class Grafo {
-
-    // ============================
-    // ATRIBUTOS
-    // ============================
-    private String nombre;                  // Nombre del grafo
-    private ArrayList<Vertice> vertices;    // Conjunto V(G)
-    private ArrayList<Arista> aristas;      // Conjunto E(G)
-    private int gradoTotal;                 // Suma de todos los grados
-
-    // ============================
-    // CONSTRUCTORES
-    // ============================
+    private String nombre;
+    private ArrayList<Vertice> vertices;
+    private ArrayList<Arista> aristas;
+    private int gradoTotal;
 
     public Grafo() {
         nombre = "";
@@ -42,10 +20,6 @@ public class Grafo {
         gradoTotal = 0;
     }
 
-    // ============================
-    // MÉTODOS DE CONSTRUCCIÓN
-    // ============================
-
     public void agregarVertice(Vertice v) {
         vertices.add(v);
     }
@@ -54,13 +28,6 @@ public class Grafo {
         aristas.add(a);
     }
 
-    // ============================
-    // MÉTODOS DE GRADO
-    // ============================
-
-    /**
-     * Grado de v: un bucle suma 2, una arista normal que incide en v suma 1.
-     */
     public int calcularGrado(Vertice v) {
         int grado = 0;
         for (Arista a : aristas) {
@@ -75,9 +42,6 @@ public class Grafo {
         return grado;
     }
 
-    /**
-     * Suma de los grados de todos los vértices.
-     */
     public int calcularGradoTotal() {
         gradoTotal = 0;
         for (Vertice v : vertices) {
@@ -86,13 +50,6 @@ public class Grafo {
         return gradoTotal;
     }
 
-    // ============================
-    // MÉTODOS DE TERMINOLOGÍA
-    // ============================
-
-    /**
-     * Vértices conectados con v por una arista (v mismo si tiene bucle).
-     */
     public ArrayList<Vertice> obtenerAdyacentes(Vertice v) {
         ArrayList<Vertice> adyacentes = new ArrayList<>();
         for (Arista a : aristas) {
@@ -114,9 +71,6 @@ public class Grafo {
         return adyacentes;
     }
 
-    /**
-     * Aristas que tienen a v como punto extremo.
-     */
     public ArrayList<Arista> obtenerAristasIncidentes(Vertice v) {
         ArrayList<Arista> incidentes = new ArrayList<>();
         for (Arista a : aristas) {
@@ -127,9 +81,6 @@ public class Grafo {
         return incidentes;
     }
 
-    /**
-     * Aristas (distintas de a) que comparten al menos un extremo con a.
-     */
     public ArrayList<Arista> obtenerAristasAdyacentes(Arista a) {
         ArrayList<Arista> adyacentes = new ArrayList<>();
         for (Arista b : aristas) {
@@ -140,9 +91,6 @@ public class Grafo {
         return adyacentes;
     }
 
-    /**
-     * Aristas que son bucles.
-     */
     public ArrayList<Arista> obtenerBucles() {
         ArrayList<Arista> bucles = new ArrayList<>();
         for (Arista a : aristas) {
@@ -153,9 +101,6 @@ public class Grafo {
         return bucles;
     }
 
-    /**
-     * Pares de aristas paralelas con formato "{e2, e3}".
-     */
     public ArrayList<String> obtenerParalelas() {
         ArrayList<String> paralelas = new ArrayList<>();
         for (int i = 0; i < aristas.size(); i++) {
@@ -170,9 +115,6 @@ public class Grafo {
         return paralelas;
     }
 
-    /**
-     * Vértices con grado 0. Llamar antes a calcularGradoTotal().
-     */
     public ArrayList<Vertice> obtenerVerticesAislados() {
         ArrayList<Vertice> aislados = new ArrayList<>();
         for (Vertice v : vertices) {
@@ -183,21 +125,10 @@ public class Grafo {
         return aislados;
     }
 
-    // ============================
-    // TEOREMAS
-    // ============================
-
-    /**
-     * Teorema del Saludo de Mano: gradoTotal == 2 × |E|.
-     */
     public boolean verificarTeoremaSaludo() {
         return calcularGradoTotal() == 2 * aristas.size();
     }
 
-    /**
-     * Un grafo con esos grados puede existir si ningún grado es negativo
-     * y la suma es par (Corolario 10.1.2).
-     */
     public boolean puedeExistirGrafo(int[] grados) {
         int suma = 0;
         for (int g : grados) {
@@ -208,10 +139,6 @@ public class Grafo {
         }
         return suma % 2 == 0;
     }
-
-    // ============================
-    // MÉTODOS DE PRESENTACIÓN
-    // ============================
 
     public void mostrarTablaExtremos() {
         System.out.println("\n--- Tabla Punto Extremo - Arista ---");
@@ -252,10 +179,6 @@ public class Grafo {
         System.out.println("¿Se cumple? " + verificarTeoremaSaludo());
     }
 
-    // ============================
-    // MÉTODOS AUXILIARES
-    // ============================
-
     private String nombres(ArrayList<Vertice> lista) {
         ArrayList<String> n = new ArrayList<>();
         for (Vertice v : lista) {
@@ -277,17 +200,13 @@ public class Grafo {
         return "Grafo " + nombre + ": |V| = " + vertices.size() + ", |E| = " + aristas.size();
     }
 
-    // ============================
-    // PROGRAMA PRINCIPAL (ejemplo)
-    // ============================
-
     public static void main(String[] args) {
         Grafo g = new Grafo("G");
 
         Vertice v1 = new Vertice("v1", 1);
         Vertice v2 = new Vertice("v2", 2);
         Vertice v3 = new Vertice("v3", 3);
-        Vertice v4 = new Vertice("v4", 4); // quedará aislado
+        Vertice v4 = new Vertice("v4", 4);
         g.agregarVertice(v1);
         g.agregarVertice(v2);
         g.agregarVertice(v3);
@@ -295,9 +214,9 @@ public class Grafo {
 
         g.agregarArista(new Arista("e1", 1, v1, v2));
         g.agregarArista(new Arista("e2", 2, v1, v3));
-        g.agregarArista(new Arista("e3", 3, v1, v3)); // paralela a e2
+        g.agregarArista(new Arista("e3", 3, v1, v3));
         g.agregarArista(new Arista("e4", 4, v2, v3));
-        g.agregarArista(new Arista("e5", 5, v3, v3)); // bucle en v3
+        g.agregarArista(new Arista("e5", 5, v3, v3));
 
         g.mostrarAnalisisCompleto();
 
