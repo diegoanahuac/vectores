@@ -38,17 +38,18 @@ El programa no pide datos. El `main` arma un grafo de ejemplo e imprime el anál
 
 ## Grafo de ejemplo
 
-Vértices: `v1, v2, v3, v4`
+```java
+Vertice v1 = new Vertice("v1", 1);
+Vertice v2 = new Vertice("v2", 2);
+Vertice v3 = new Vertice("v3", 3);
+Vertice v4 = new Vertice("v4", 4);
 
-| Arista | Extremos | Observación |
-|---|---|---|
-| e1 | {v1, v2} | |
-| e2 | {v1, v3} | paralela a e3 |
-| e3 | {v1, v3} | paralela a e2 |
-| e4 | {v2, v3} | |
-| e5 | {v3} | bucle |
-
-`v4` no tiene aristas, así que queda aislado.
+g.agregarArista(new Arista("e1", 1, v1, v2));
+g.agregarArista(new Arista("e2", 2, v1, v3));
+g.agregarArista(new Arista("e3", 3, v1, v3));
+g.agregarArista(new Arista("e4", 4, v2, v3));
+g.agregarArista(new Arista("e5", 5, v3, v3));
+```
 
 ```
           v1
@@ -60,34 +61,58 @@ Vértices: `v1, v2, v3, v4`
      v4 (aislado)
 ```
 
+- `e2` y `e3` unen los mismos vértices (v1 y v3), así que son **paralelas**.
+- `e5` empieza y termina en v3, así que es un **bucle**.
+- `v4` no tiene ninguna arista, así que queda **aislado**.
+
 ---
 
 ## Fase 1. Clase `Vertice`
 
 Representa un nodo del grafo, un elemento del conjunto V(G).
 
-### Atributos
+```java
+private String nombre;
+private int id;
+private int grado;
+private boolean esAislado;
+```
 
-| Atributo | Tipo | Para qué sirve |
-|---|---|---|
-| `nombre` | `String` | Nombre del vértice, por ejemplo `"v1"` |
-| `id` | `int` | Identificador numérico único |
-| `grado` | `int` | Grado del vértice, lo calcula la clase `Grafo` |
-| `esAislado` | `boolean` | `true` si ninguna arista incide en él |
-
-### Constructores
-
-- `Vertice()`: deja `nombre = ""`, `id = 0`, `grado = 0` y `esAislado = true`.
-- `Vertice(nombre, id)`: asigna nombre e id. El grado empieza en 0 y el vértice empieza aislado, porque todavía no tiene aristas.
-
-### Métodos
-
-- Getters y setters de cada atributo.
-- `toString()` regresa `"v1 (grado: 3)"`, y si el vértice es aislado agrega `[AISLADO]`: `"v4 (grado: 0) [AISLADO]"`.
+- `nombre`: nombre del vértice, por ejemplo `"v1"`.
+- `id`: identificador numérico único.
+- `grado`: grado del vértice. No se calcula aquí, lo calcula la clase `Grafo`.
+- `esAislado`: `true` si ninguna arista incide en él.
 
 ```java
-Vertice v1 = new Vertice("v1", 1);
+public Vertice() {
+    nombre = "";
+    id = 0;
+    grado = 0;
+    esAislado = true;
+}
+
+public Vertice(String nombre, int id) {
+    this.nombre = nombre;
+    this.id = id;
+    grado = 0;
+    esAislado = true;
+}
 ```
+
+El constructor vacío deja todo en valores por defecto. El parametrizado recibe nombre e id. En los dos el grado empieza en 0 y el vértice empieza aislado, porque todavía no tiene aristas.
+
+```java
+@Override
+public String toString() {
+    String texto = nombre + " (grado: " + grado + ")";
+    if (esAislado) {
+        texto += " [AISLADO]";
+    }
+    return texto;
+}
+```
+
+Regresa `"v1 (grado: 3)"`. Si el vértice es aislado agrega `[AISLADO]` al final: `"v4 (grado: 0) [AISLADO]"`. El resto de la clase son getters y setters.
 
 ---
 
@@ -95,109 +120,145 @@ Vertice v1 = new Vertice("v1", 1);
 
 Representa una conexión entre dos vértices, un elemento del conjunto E(G).
 
-### Atributos
-
-| Atributo | Tipo | Para qué sirve |
-|---|---|---|
-| `nombre` | `String` | Nombre de la arista, por ejemplo `"e1"` |
-| `id` | `int` | Identificador numérico único |
-| `extremo1` | `Vertice` | Primer punto extremo |
-| `extremo2` | `Vertice` | Segundo punto extremo |
-| `esBucle` | `boolean` | `true` si los dos extremos son el mismo vértice |
-
-### Constructores
-
-- `Arista()`: todo en valores por defecto (`""`, `0`, `null`, `null`, `false`).
-- `Arista(nombre, id, extremo1, extremo2)`: asigna los datos y **decide solo si es bucle**:
-
 ```java
-esBucle = (extremo1 == extremo2);
+private String nombre;
+private int id;
+private Vertice extremo1;
+private Vertice extremo2;
+private boolean esBucle;
 ```
 
-### `esParalela(Arista otra)`
-
-Dos aristas son paralelas si son distintas y tienen los mismos extremos. Como el grafo no es dirigido, `{v1, v3}` es lo mismo que `{v3, v1}`, por eso se revisan los dos órdenes:
+- `nombre` e `id`: igual que en el vértice, por ejemplo `"e1"` y `1`.
+- `extremo1` y `extremo2`: los dos vértices que une la arista.
+- `esBucle`: `true` si los dos extremos son el mismo vértice.
 
 ```java
-if (this.id == otra.id) {
-    return false;
+public Arista(String nombre, int id, Vertice extremo1, Vertice extremo2) {
+    this.nombre = nombre;
+    this.id = id;
+    this.extremo1 = extremo1;
+    this.extremo2 = extremo2;
+    esBucle = (extremo1 == extremo2);
 }
-boolean mismoOrden = (this.extremo1 == otra.extremo1 && this.extremo2 == otra.extremo2);
-boolean ordenInverso = (this.extremo1 == otra.extremo2 && this.extremo2 == otra.extremo1);
-return mismoOrden || ordenInverso;
 ```
 
-La primera condición evita que una arista salga como paralela a sí misma.
+El constructor parametrizado guarda los datos y **decide solo si es bucle**: si `extremo1` y `extremo2` son el mismo vértice, `esBucle` queda en `true`. El constructor vacío deja todo en `""`, `0`, `null` y `false`.
 
-### `incideEn(Vertice v)`
+```java
+public boolean esParalela(Arista otra) {
+    if (this.id == otra.id) {
+        return false;
+    }
+    boolean mismoOrden = (this.extremo1 == otra.extremo1 && this.extremo2 == otra.extremo2);
+    boolean ordenInverso = (this.extremo1 == otra.extremo2 && this.extremo2 == otra.extremo1);
+    return mismoOrden || ordenInverso;
+}
+```
 
-Una arista incide en cada uno de sus extremos. Regresa `true` si `v` es `extremo1` o `extremo2`.
+Dos aristas son paralelas si son distintas y tienen los mismos extremos.
 
-### `toString()` y `extremosTexto()`
+1. Si tienen el mismo id es la misma arista, entonces no cuenta como paralela.
+2. Como el grafo no es dirigido, `{v1, v3}` es lo mismo que `{v3, v1}`. Por eso se revisan los dos órdenes.
 
-- Arista normal: `"e1: {v1, v2}"`
-- Bucle: `"e5: {v3} [BUCLE]"` (solo se muestra un extremo)
+```java
+public boolean incideEn(Vertice v) {
+    return extremo1 == v || extremo2 == v;
+}
+```
 
-`extremosTexto()` arma solo la parte de los extremos y también la usa la tabla de la Fase 6.
+Una arista incide en cada uno de sus extremos. Regresa `true` si `v` es uno de los dos.
+
+```java
+public String extremosTexto() {
+    if (esBucle) {
+        return "{" + extremo1.getNombre() + "} [BUCLE]";
+    }
+    return "{" + extremo1.getNombre() + ", " + extremo2.getNombre() + "}";
+}
+```
+
+Arma el texto de los extremos: `"{v1, v2}"` para una arista normal y `"{v3} [BUCLE]"` para un bucle, donde solo se muestra un extremo. Lo usan `toString()` (`"e1: {v1, v2}"`) y la tabla de la Fase 6.
 
 ---
 
 ## Fase 3. Clase `Grafo`: construcción
 
-### Atributos
+```java
+private String nombre;
+private ArrayList<Vertice> vertices;
+private ArrayList<Arista> aristas;
+private int gradoTotal;
+```
 
-| Atributo | Tipo | Para qué sirve |
-|---|---|---|
-| `nombre` | `String` | Nombre del grafo |
-| `vertices` | `ArrayList<Vertice>` | Conjunto V(G) |
-| `aristas` | `ArrayList<Arista>` | Conjunto E(G) |
-| `gradoTotal` | `int` | Suma de los grados de todos los vértices |
+- `vertices`: el conjunto V(G).
+- `aristas`: el conjunto E(G).
+- `gradoTotal`: la suma de los grados de todos los vértices.
 
-### Constructores y métodos de construcción
+```java
+public Grafo(String nombre) {
+    this.nombre = nombre;
+    vertices = new ArrayList<>();
+    aristas = new ArrayList<>();
+    gradoTotal = 0;
+}
 
-- `Grafo()` y `Grafo(nombre)` crean las dos listas vacías y ponen `gradoTotal = 0`.
-- `agregarVertice(v)` agrega el vértice a `vertices`.
-- `agregarArista(a)` agrega la arista a `aristas`.
-- `toString()` regresa `"Grafo G: |V| = 4, |E| = 5"`.
+public void agregarVertice(Vertice v) {
+    vertices.add(v);
+}
+
+public void agregarArista(Arista a) {
+    aristas.add(a);
+}
+```
+
+El constructor crea las dos listas vacías. `agregarVertice` y `agregarArista` solo meten el elemento en su lista. `toString()` regresa `"Grafo G: |V| = 4, |E| = 5"`.
 
 ---
 
 ## Fase 4. Grado de los vértices
 
-### `calcularGrado(Vertice v)`
+```java
+public int calcularGrado(Vertice v) {
+    int grado = 0;
+    for (Arista a : aristas) {
+        if (a.esBucle() && a.getExtremo1() == v) {
+            grado += 2;
+        } else if (!a.esBucle() && a.incideEn(v)) {
+            grado += 1;
+        }
+    }
+    v.setGrado(grado);
+    v.setEsAislado(grado == 0);
+    return grado;
+}
+```
 
 Recorre todas las aristas y aplica la **regla clave**:
 
-- Si la arista es un bucle en `v` → suma **2** (el bucle toca dos veces al vértice).
-- Si no es bucle pero incide en `v` → suma **1**.
-
-```java
-for (Arista a : aristas) {
-    if (a.esBucle() && a.getExtremo1() == v) {
-        grado += 2;
-    } else if (!a.esBucle() && a.incideEn(v)) {
-        grado += 1;
-    }
-}
-v.setGrado(grado);
-v.setEsAislado(grado == 0);
-```
+- Si la arista es un bucle en `v` suma **2**, porque el bucle toca dos veces al vértice.
+- Si no es bucle pero incide en `v` suma **1**.
 
 Al final guarda el grado en el vértice y lo marca como aislado si quedó en 0.
 
-### `calcularGradoTotal()`
+```java
+public int calcularGradoTotal() {
+    gradoTotal = 0;
+    for (Vertice v : vertices) {
+        gradoTotal += calcularGrado(v);
+    }
+    return gradoTotal;
+}
+```
 
-Llama a `calcularGrado` para cada vértice y suma los resultados.
+Calcula el grado de cada vértice y los suma.
 
-### Resultado con el ejemplo
+Con el ejemplo:
 
-| Vértice | Aristas | Grado |
-|---|---|---|
-| v1 | e1, e2, e3 | 3 |
-| v2 | e1, e4 | 2 |
-| v3 | e2, e3, e4 + bucle e5 (×2) | 3 + 2 = **5** |
-| v4 | ninguna | 0 [AISLADO] |
-| | **Grado total** | **10** |
+- `v1` tiene e1, e2 y e3 → grado **3**.
+- `v2` tiene e1 y e4 → grado **2**.
+- `v3` tiene e2, e3 y e4, más el bucle e5 que vale 2 → 3 + 2 = **5**.
+- `v4` no tiene aristas → grado **0**, aislado.
+- Grado total: 3 + 2 + 5 + 0 = **10**.
 
 ### Prueba
 
@@ -209,23 +270,103 @@ Llama a `calcularGrado` para cada vértice y suma los resultados.
 
 Todos estos métodos siguen la misma idea: recorrer una lista y quedarse con los elementos que cumplen la condición.
 
-| Método | Qué regresa | Condición |
-|---|---|---|
-| `obtenerAdyacentes(v)` | Vértices adyacentes a `v` | Están unidos a `v` por una arista. Si `v` tiene un bucle, `v` es adyacente a sí mismo. No se repiten. |
-| `obtenerAristasIncidentes(v)` | Aristas que inciden en `v` | `a.incideEn(v)` |
-| `obtenerAristasAdyacentes(a)` | Aristas adyacentes a `a` | Son distintas de `a` y comparten al menos un extremo con ella |
-| `obtenerBucles()` | Aristas que son bucles | `a.esBucle()` |
-| `obtenerParalelas()` | Pares de aristas paralelas, como `"{e2, e3}"` | `esParalela`, con un doble `for` donde el segundo empieza en `i + 1` para no repetir pares |
-| `obtenerVerticesAislados()` | Vértices aislados | `v.esAislado()`. Necesita que antes se haya llamado `calcularGradoTotal()` |
+### Vértices adyacentes
 
-### Resultado con el ejemplo
+```java
+public ArrayList<Vertice> obtenerAdyacentes(Vertice v) {
+    ArrayList<Vertice> adyacentes = new ArrayList<>();
+    for (Arista a : aristas) {
+        if (!a.incideEn(v)) {
+            continue;
+        }
+        Vertice otro;
+        if (a.esBucle()) {
+            otro = v;
+        } else if (a.getExtremo1() == v) {
+            otro = a.getExtremo2();
+        } else {
+            otro = a.getExtremo1();
+        }
+        if (!adyacentes.contains(otro)) {
+            adyacentes.add(otro);
+        }
+    }
+    return adyacentes;
+}
+```
 
-- Adyacentes a v3: `[v1, v2, v3]` (v3 aparece por su bucle).
-- Aristas incidentes en v3: `[e2, e3, e4, e5]`.
-- Aristas adyacentes a e1: `[e2, e3, e4]`.
-- Bucles: `[e5]`.
-- Aristas paralelas: `[{e2, e3}]`.
-- Vértices aislados: `[v4]`.
+Dos vértices son adyacentes si una arista los une.
+
+1. Se salta las aristas que no tocan a `v`.
+2. Si es bucle, el vértice adyacente es el mismo `v`.
+3. Si no, el adyacente es el **otro** extremo de la arista.
+4. Con `contains` evita repetidos. Por eso v1 sale una sola vez en los adyacentes de v3 aunque e2 y e3 los unan a los dos.
+
+Ejemplo: adyacentes a v3 → `[v1, v2, v3]`. v3 aparece por su bucle.
+
+### Aristas incidentes
+
+```java
+for (Arista a : aristas) {
+    if (a.incideEn(v)) {
+        incidentes.add(a);
+    }
+}
+```
+
+Guarda las aristas que tienen a `v` como extremo. Ejemplo: incidentes en v3 → `[e2, e3, e4, e5]`.
+
+### Aristas adyacentes
+
+```java
+for (Arista b : aristas) {
+    if (b != a && (b.incideEn(a.getExtremo1()) || b.incideEn(a.getExtremo2()))) {
+        adyacentes.add(b);
+    }
+}
+```
+
+Dos aristas son adyacentes si comparten al menos un extremo. `b != a` evita que una arista salga como adyacente a sí misma. Ejemplo: adyacentes a e1 → `[e2, e3, e4]`.
+
+### Bucles
+
+```java
+for (Arista a : aristas) {
+    if (a.esBucle()) {
+        bucles.add(a);
+    }
+}
+```
+
+Guarda las aristas que son bucle. Ejemplo: `[e5]`.
+
+### Aristas paralelas
+
+```java
+for (int i = 0; i < aristas.size(); i++) {
+    for (int j = i + 1; j < aristas.size(); j++) {
+        Arista a = aristas.get(i);
+        Arista b = aristas.get(j);
+        if (a.esParalela(b)) {
+            paralelas.add("{" + a.getNombre() + ", " + b.getNombre() + "}");
+        }
+    }
+}
+```
+
+Compara cada par de aristas con `esParalela`. El segundo `for` empieza en `i + 1` para no comparar una arista consigo misma ni repetir el mismo par al revés. Ejemplo: `[{e2, e3}]`.
+
+### Vértices aislados
+
+```java
+for (Vertice v : vertices) {
+    if (v.esAislado()) {
+        aislados.add(v);
+    }
+}
+```
+
+Guarda los vértices con grado 0. Necesita que antes se haya llamado `calcularGradoTotal()`, porque ahí se actualiza `esAislado`. Ejemplo: `[v4]`.
 
 ### Prueba
 
@@ -241,17 +382,18 @@ Bucles, aristas paralelas y vértices aislados:
 
 ## Fase 6. Tabla de función punto extremo-arista
 
-`mostrarTablaExtremos()` imprime cada arista con sus extremos, usando `printf` para alinear las columnas:
+```java
+public void mostrarTablaExtremos() {
+    System.out.println("\n--- Tabla Punto Extremo - Arista ---");
+    System.out.printf("| %-8s | %-22s |%n", "Arista", "Punto(s) Extremo(s)");
+    System.out.println("|----------|------------------------|");
+    for (Arista a : aristas) {
+        System.out.printf("| %-8s | %-22s |%n", a.getNombre(), a.extremosTexto());
+    }
+}
+```
 
-```
-| Arista   | Punto(s) Extremo(s)    |
-|----------|------------------------|
-| e1       | {v1, v2}               |
-| e2       | {v1, v3}               |
-| e3       | {v1, v3}               |
-| e4       | {v2, v3}               |
-| e5       | {v3} [BUCLE]           |
-```
+Imprime el encabezado y después una fila por cada arista con su nombre y sus extremos. `%-8s` y `%-22s` rellenan con espacios para que las columnas queden alineadas. Para los bucles `extremosTexto()` ya agrega `[BUCLE]`.
 
 ### Prueba
 
@@ -261,19 +403,34 @@ Bucles, aristas paralelas y vértices aislados:
 
 ## Fase 7. Teoremas
 
-### `verificarTeoremaSaludo()`
-
-**Teorema del Saludo de Mano:** la suma de los grados de todos los vértices es igual al doble del número de aristas, porque cada arista aporta 2 al grado total (1 por cada extremo, o 2 al mismo vértice si es bucle).
+### Teorema del Saludo de Mano
 
 ```java
-return calcularGradoTotal() == 2 * aristas.size();
+public boolean verificarTeoremaSaludo() {
+    return calcularGradoTotal() == 2 * aristas.size();
+}
 ```
 
-Con el ejemplo: grado total = 10 y 2 × |E| = 2 × 5 = 10 → **se cumple**.
+La suma de los grados de todos los vértices es igual al doble del número de aristas, porque cada arista aporta 2 al grado total: 1 por cada extremo, o 2 al mismo vértice si es bucle.
 
-### `puedeExistirGrafo(int[] grados)`
+Con el ejemplo: grado total = 10 y 2 × 5 aristas = 10 → **se cumple**.
 
-**Corolario 10.1.2:** el grado total de un grafo siempre es par. Entonces un grafo con ciertos grados solo puede existir si ningún grado es negativo y la suma es par.
+### ¿Puede existir un grafo con estos grados?
+
+```java
+public boolean puedeExistirGrafo(int[] grados) {
+    int suma = 0;
+    for (int g : grados) {
+        if (g < 0) {
+            return false;
+        }
+        suma += g;
+    }
+    return suma % 2 == 0;
+}
+```
+
+Por el **Corolario 10.1.2**, el grado total de un grafo siempre es par. Entonces un grafo con ciertos grados solo puede existir si ningún grado es negativo y la suma es par.
 
 - `{3, 2, 5, 0}` → suma 10, par → `true`.
 - `{3, 2, 2}` → suma 7, impar → `false`.
@@ -286,6 +443,19 @@ Con el ejemplo: grado total = 10 y 2 × |E| = 2 × 5 = 10 → **se cumple**.
 
 ## Fase 8. Análisis completo y `main`
 
+```java
+public static void main(String[] args) {
+    Grafo g = new Grafo("G");
+    // se crean v1..v4 y e1..e5 como en el grafo de ejemplo
+    g.mostrarAnalisisCompleto();
+
+    System.out.println("{3, 2, 5, 0}: " + g.puedeExistirGrafo(new int[]{3, 2, 5, 0}));
+    System.out.println("{3, 2, 2}:    " + g.puedeExistirGrafo(new int[]{3, 2, 2}));
+}
+```
+
+El `main` está dentro de `Grafo` para no usar una cuarta clase. Crea el grafo de ejemplo, llama a `mostrarAnalisisCompleto()` y al final prueba `puedeExistirGrafo` con dos listas de grados.
+
 `mostrarAnalisisCompleto()` junta todo en un solo reporte, en este orden:
 
 1. Nombre del grafo con |V| y |E|.
@@ -294,17 +464,6 @@ Con el ejemplo: grado total = 10 y 2 × |E| = 2 × 5 = 10 → **se cumple**.
 4. Adyacencia e incidencia de cada vértice y aristas adyacentes de cada arista.
 5. Bucles, aristas paralelas y vértices aislados.
 6. Verificación del Teorema del Saludo de Mano.
-
-El `main` (dentro de `Grafo`) crea los vértices y aristas del ejemplo, llama a `mostrarAnalisisCompleto()` y al final prueba `puedeExistirGrafo` con dos listas de grados.
-
-```java
-Grafo g = new Grafo("G");
-Vertice v1 = new Vertice("v1", 1);
-g.agregarVertice(v1);
-g.agregarArista(new Arista("e1", 1, v1, v2));
-g.agregarArista(new Arista("e5", 5, v3, v3));
-g.mostrarAnalisisCompleto();
-```
 
 ### Prueba
 
