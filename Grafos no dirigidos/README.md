@@ -229,6 +229,12 @@ Todos estos métodos siguen la misma idea: recorrer una lista y quedarse con los
 
 ### Prueba
 
+Adyacencia e incidencia:
+
+![Fase 5 - Adyacencia e incidencia](assets/fase5_adyacencia.png)
+
+Bucles, aristas paralelas y vértices aislados:
+
 ![Fase 5 - Terminología](assets/fase5_terminologia.png)
 
 ---
