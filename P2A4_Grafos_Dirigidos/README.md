@@ -25,6 +25,8 @@ javac GrafosDirigidos.java && java GrafosDirigidos
 
 El programa no pide datos: imprime la solución de los 3 ejercicios.
 
+`javac` compila el código y genera `GrafosDirigidos.class`, que es el archivo que Java ejecuta. Ese archivo no se edita ni se sube al repositorio; el que se modifica es `GrafosDirigidos.java`.
+
 ---
 
 ## Fase 1. La idea: matriz de adyacencia
