@@ -1,0 +1,11 @@
+# Pueblos Magicos de Yucatan -- Distancias en km (Google Maps, ruta recomendada)
+Izamal Motul 37.5
+Izamal Valladolid 110
+Izamal Espita 80.5
+Izamal Mani 136
+Motul Sisal 100
+Motul Espita 124
+Valladolid Espita 51.2
+Valladolid Tekax 164
+Sisal Mani 159
+Mani Tekax 26.8
